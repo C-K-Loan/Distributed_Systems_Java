@@ -1,0 +1,5 @@
+-Develop Email-Server u sing Java Nio
+
+-Support HELo, MAIL FROM, RCPT TO, DATA, HELP, QUIT
+
+-Store Recieved E-mail  as <sender>_<message_id>  in directory /reciever, sender corrosponds to sender, The folder Reciever Corrosponds to the folder Reciever

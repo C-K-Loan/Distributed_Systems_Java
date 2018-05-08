@@ -68,12 +68,12 @@ public class MsgReciever implements  Runnable {
     //We Also need the message amount, so we know how many Messages we Had, at the point this function was invoked
     //We will send the messages of POS(MessageAmount) - messageCount    . while decreasing MessageCount Iterativly
     private boolean notifySequencerOfNewMessages(int messageCount, int logLenth) {
-
+        System.out.println("RECIEVER ID <" + this.id+ "> NOTFIYING");
         this.externalRecievedMsgCount = 0;//Reset the Internal MEsage Count, so we will take care of new messages
 
         while (logLenth > 0) {
-            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.externalMessageLog.get(logLenth - messageCount));
-            System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
+            //System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.externalMessageLog.get(logLenth - messageCount));
+            //System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
             this.sequencer.recieveInternalMessage(this.externalMessageLog.get(logLenth - messageCount));
             messageCount -- ;
 

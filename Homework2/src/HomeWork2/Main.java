@@ -6,7 +6,7 @@ import java.util.LinkedList;
 public class Main {
 
     public static void main(String[] args) throws  java.io.FileNotFoundException {
-        testThreadingAndPollingOneThread();
+        testThreadingAndPollingTwoThreads();
 
 
     }
@@ -21,7 +21,7 @@ public class Main {
         Thread t =         new Thread(reciever);
 
         t.start();
-        for ( int i = 0 ; i < 100; i++){
+        for ( int i = 0 ; i < 7000; i++){
             //System.out.println("Sending msg");
             reciever.recvieveExternalMessage(i);
         }
@@ -29,6 +29,30 @@ public class Main {
         reciever.storeMessageLogToFile();
 
     }
+
+    public static void testThreadingAndPollingTwoThreads() throws java.io.FileNotFoundException{
+        MessageSequencer sequencer = new MessageSequencer();
+        MsgReciever reciever = new MsgReciever(sequencer,0);
+        MsgReciever reciever2 = new MsgReciever(sequencer,2);
+
+        Thread t =         new Thread(reciever);
+        Thread t2 =         new Thread(reciever2);
+
+
+        t.start();
+        t2.start();
+
+
+        for ( int i = 0 ; i < 10; i++){
+            //System.out.println("Sending msg");
+            reciever.recvieveExternalMessage(i);
+            reciever2.recvieveExternalMessage(i+1);
+        }
+
+        reciever.storeMessageLogToFile();
+
+    }
+
 
     public static void testRecieverRecievingMessagesAndStoringToFile() throws java.io.FileNotFoundException{
 

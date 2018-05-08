@@ -21,7 +21,7 @@ public class Main {
         Thread t =         new Thread(reciever);
 
         t.start();
-        for ( int i = 0 ; i < 500; i++){
+        for ( int i = 0 ; i < 100; i++){
             //System.out.println("Sending msg");
             reciever.recvieveExternalMessage(i);
         }

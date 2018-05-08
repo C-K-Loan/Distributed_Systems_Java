@@ -37,15 +37,14 @@ public class MsgReciever implements  Runnable {
 
         //we must have recvd a new message -> notify Sequencer to broadcast it
         if( this.externalRecievedMsgCount > 0 ) {
-                System.out.println("Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.internalMessageLog.size()+" messages");
-                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.internalMessageLog.size());//we just store a value, so we wait for the answer of this call
+                System.out.println("Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalMessageLog.size()+" messages");
+                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.externalMessageLog.size());//we just store a value, so we wait for the answer of this call
 
             }
     }
 
 
     }
-
 
     //Recv Message from Sequencer
     public void recvieveInternalMessage( int message ){
@@ -54,12 +53,11 @@ public class MsgReciever implements  Runnable {
 
     }
 
-
     //Recv Message from Client
     public void recvieveExternalMessage(int message){
-        //System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
+        System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
         this.externalRecievedMsgCount++;
-        this.internalMessageLog.add(message);
+        this.externalMessageLog.add(message);
        // System.out.println("LISTSIZE:" + this.messageLog.size());
 
     }
@@ -70,15 +68,19 @@ public class MsgReciever implements  Runnable {
     //We Also need the message amount, so we know how many Messages we Had, at the point this function was invoked
     //We will send the messages of POS(MessageAmount) - messageCount    . while decreasing MessageCount Iterativly
     private boolean notifySequencerOfNewMessages(int messageCount, int logLenth) {
+
         this.externalRecievedMsgCount = 0;//Reset the Internal MEsage Count, so we will take care of new messages
+
         while (logLenth > 0) {
-            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.internalMessageLog.get(logLenth - messageCount));
+            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.externalMessageLog.get(logLenth - messageCount));
             System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
-            this.sequencer.recieveInternalMessage(this.internalMessageLog.get(logLenth - messageCount));
+            this.sequencer.recieveInternalMessage(this.externalMessageLog.get(logLenth - messageCount));
             messageCount -- ;
 
         }
+
     return true;
+
     }
 
 
@@ -91,7 +93,7 @@ public class MsgReciever implements  Runnable {
     //Store Messages in a File after Reciever Shutdown
     public void storeMessageLogToFile() throws java.io.FileNotFoundException  {
 
-        File file = new File("/home/loan/Documents/uni/semester9/distributed_systems/Homework2/src/HomeWork2/Logs/LOG-ID-"+this.id+".txt");
+        File file = new File("/home/loan/Documents/uni/semester9/distributed_systems/Distributed_Systems_Java/Homework2/src/HomeWork2/Logs/LOG-ID-"+this.id+".txt");
         PrintWriter pw = new PrintWriter(file);
        for (int message : this.internalMessageLog){
            pw.write(Integer.toString( message ) );

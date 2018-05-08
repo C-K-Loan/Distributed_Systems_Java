@@ -9,7 +9,9 @@ import java.util.LinkedList;
 
 public class MsgReciever implements  Runnable {
 
-    LinkedList<Integer> messageLog;
+    LinkedList<Integer> internalMessageLog;
+    LinkedList<Integer> externalMessageLog;
+
     MessageSequencer sequencer;
     int id;
     int externalRecievedMsgCount ; //If ext Msg Count is >0, we must have recieved new External Messages and broadcast them
@@ -19,7 +21,9 @@ public class MsgReciever implements  Runnable {
         this.externalRecievedMsgCount = 0 ;
         this.sequencer = sequencer;
         this.id = id;
-        this.messageLog = new LinkedList<Integer>();
+        this.internalMessageLog = new LinkedList<Integer>();
+        this.externalMessageLog = new LinkedList<Integer>();
+
     }
 
 
@@ -33,8 +37,8 @@ public class MsgReciever implements  Runnable {
 
         //we must have recvd a new message -> notify Sequencer to broadcast it
         if( this.externalRecievedMsgCount > 0 ) {
-                System.out.println("Reciever ID <"+this.id+"> notifying " + this.messageLog.size()+" messages");
-                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.messageLog.size());//we just store a value, so we wait for the answer of this call
+                System.out.println("Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.internalMessageLog.size()+" messages");
+                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.internalMessageLog.size());//we just store a value, so we wait for the answer of this call
 
             }
     }
@@ -46,17 +50,17 @@ public class MsgReciever implements  Runnable {
     //Recv Message from Sequencer
     public void recvieveInternalMessage( int message ){
         System.out.println("Reciever <" + this.id+"> got [INTERNAL]  message : " + message);
-        this.messageLog.add(message);
+        this.internalMessageLog.add(message);
 
     }
 
 
     //Recv Message from Client
     public void recvieveExternalMessage(int message){
-        System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
+        //System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
         this.externalRecievedMsgCount++;
-        this.messageLog.add(message);
-        System.out.println("LISTSIZE:" + this.messageLog.size());
+        this.internalMessageLog.add(message);
+       // System.out.println("LISTSIZE:" + this.messageLog.size());
 
     }
 
@@ -68,9 +72,9 @@ public class MsgReciever implements  Runnable {
     private boolean notifySequencerOfNewMessages(int messageCount, int logLenth) {
         this.externalRecievedMsgCount = 0;//Reset the Internal MEsage Count, so we will take care of new messages
         while (logLenth > 0) {
-            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.messageLog.get(logLenth - messageCount));
+            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.internalMessageLog.get(logLenth - messageCount));
             System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
-            this.sequencer.recieveInternalMessage(this.messageLog.get(logLenth - messageCount));
+            this.sequencer.recieveInternalMessage(this.internalMessageLog.get(logLenth - messageCount));
             messageCount -- ;
 
         }
@@ -89,7 +93,7 @@ public class MsgReciever implements  Runnable {
 
         File file = new File("/home/loan/Documents/uni/semester9/distributed_systems/Homework2/src/HomeWork2/Logs/LOG-ID-"+this.id+".txt");
         PrintWriter pw = new PrintWriter(file);
-       for (int message : this.messageLog){
+       for (int message : this.internalMessageLog){
            pw.write(Integer.toString( message ) );
            pw.write("\n");
        }

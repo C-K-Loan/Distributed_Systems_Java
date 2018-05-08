@@ -13,6 +13,13 @@ public class Main {
 
 
 
+    public static void testIntArrays(){
+
+        int[] testarr = new int[100];
+
+
+
+    }
 
     public static void testThreadingAndPollingOneThread() throws java.io.FileNotFoundException{
         MessageSequencer sequencer = new MessageSequencer();

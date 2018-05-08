@@ -41,7 +41,7 @@ public class MsgReciever implements  Runnable {
 
 
     public void run(){
-    System.out.println("Thread <"+ this.id+ "> running!");
+    System.out.println("______________________________________Thread <"+ this.id+ "> running!_________________________________________________________");
     boolean sending;
     //Infite poll loop
     while (true)
@@ -50,9 +50,9 @@ public class MsgReciever implements  Runnable {
 
         //we must have recvd a new message -> notify Sequencer to broadcast it
         if( this.externalRecievedMsgCount > 0 ) {
-                System.out.println("Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalMessageLog.length +" messages");
+                System.out.println("___________Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalMessageLog.length +" messages____________________________");
                 sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.externalMessageLog.length);//we just store a value, so we wait for the answer of this call
-
+                System.out.println("_______________________Done Notifiying!____________________");
             }
     }
 
@@ -89,8 +89,12 @@ public class MsgReciever implements  Runnable {
         this.externalRecievedMsgCount = 0;//Reset the Internal MEsage Count, so we will take care of new messages
 
         while (logLenth > 0) {
-            //System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.externalMessageLog.get(logLenth - messageCount));
-            //System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
+            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : NR " +(logLenth - messageCount));
+            System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
+            if ((logLenth - messageCount) >= this.externalMessageLog.length ){
+                System.out.println("_____!!_!_!__!_!_!__!_!_!_!__!_!_BREAKING LOOOP WE ARE TRYING TO GET ELE " + (logLenth - messageCount));
+                break;
+            }
             this.sequencer.recieveInternalMessage(this.externalMessageLog[(logLenth - messageCount)]);
             messageCount -- ;
 

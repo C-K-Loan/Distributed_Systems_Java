@@ -6,8 +6,10 @@ import java.util.LinkedList;
 public class Main {
 
     public static void main(String[] args) throws  java.io.FileNotFoundException {
-        testThreadingAndPollingTwoThreads();
+       // testThreadingAndPollingTwoThreads();
 
+       int amountOfMessages = 1000;
+        testThreadingAndPollingOneThread(amountOfMessages);
 
     }
 
@@ -21,14 +23,14 @@ public class Main {
 
     }
 
-    public static void testThreadingAndPollingOneThread() throws java.io.FileNotFoundException{
+    public static void testThreadingAndPollingOneThread(int amountOfMessages) throws java.io.FileNotFoundException{
         MessageSequencer sequencer = new MessageSequencer();
-        MsgReciever reciever = new MsgReciever(sequencer,0);
+        MsgReciever reciever = new MsgReciever(sequencer,amountOfMessages,0);
 
         Thread t =         new Thread(reciever);
 
         t.start();
-        for ( int i = 0 ; i < 7000; i++){
+        for ( int i = 0 ; i < 100; i++){
             //System.out.println("Sending msg");
             reciever.recvieveExternalMessage(i);
         }
@@ -37,10 +39,10 @@ public class Main {
 
     }
 
-    public static void testThreadingAndPollingTwoThreads() throws java.io.FileNotFoundException{
+    public static void testThreadingAndPollingTwoThreads(int amountOfMessages) throws java.io.FileNotFoundException{
         MessageSequencer sequencer = new MessageSequencer();
-        MsgReciever reciever = new MsgReciever(sequencer,0);
-        MsgReciever reciever2 = new MsgReciever(sequencer,2);
+        MsgReciever reciever = new MsgReciever(sequencer, amountOfMessages, 0);
+        MsgReciever reciever2 = new MsgReciever(sequencer, amountOfMessages, 2);
 
         Thread t =         new Thread(reciever);
         Thread t2 =         new Thread(reciever2);
@@ -61,9 +63,9 @@ public class Main {
     }
 
 
-    public static void testRecieverRecievingMessagesAndStoringToFile() throws java.io.FileNotFoundException{
+    public static void testRecieverRecievingMessagesAndStoringToFile(int amountOfMessages ) throws java.io.FileNotFoundException{
 
-        MsgReciever reciever = new MsgReciever(null,0);
+        MsgReciever reciever = new MsgReciever(null, amountOfMessages, 0);
         for ( int i = 0 ; i < 100; i++){
             reciever.recvieveExternalMessage(i);
         }

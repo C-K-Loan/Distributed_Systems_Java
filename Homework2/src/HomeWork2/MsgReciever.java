@@ -1,6 +1,5 @@
 package HomeWork2;
 
-import sun.plugin2.message.Message;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -9,20 +8,34 @@ import java.util.LinkedList;
 
 public class MsgReciever implements  Runnable {
 
-    LinkedList<Integer> internalMessageLog;
-    LinkedList<Integer> externalMessageLog;
+ //   LinkedList<Integer> internalMessageLog;
+//    LinkedList<Integer> externalMessageLog;
 
     MessageSequencer sequencer;
+
+    int [] internalMessageLog, externalMessageLog;
+
+
     int id;
     int externalRecievedMsgCount ; //If ext Msg Count is >0, we must have recieved new External Messages and broadcast them
 
+    int internalMessageCount,extenalMessageCount; //represents how many solts in our message array are allocated
 
-    public MsgReciever( MessageSequencer sequencer, int id ){
+    public MsgReciever( MessageSequencer sequencer, int internalMessageAmount, int id ){
         this.externalRecievedMsgCount = 0 ;
         this.sequencer = sequencer;
         this.id = id;
-        this.internalMessageLog = new LinkedList<Integer>();
-        this.externalMessageLog = new LinkedList<Integer>();
+
+        //both can be same size
+        this.internalMessageLog  = new int[internalMessageAmount];
+        this.externalMessageLog = new int[internalMessageAmount];
+
+        this.internalMessageCount = 0;
+        this.externalRecievedMsgCount = 0;
+
+        //this.internalMessageLog = new LinkedList<Integer>();
+        //this.externalMessageLog = new LinkedList<Integer>();
+
 
     }
 
@@ -37,8 +50,8 @@ public class MsgReciever implements  Runnable {
 
         //we must have recvd a new message -> notify Sequencer to broadcast it
         if( this.externalRecievedMsgCount > 0 ) {
-                System.out.println("Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalMessageLog.size()+" messages");
-                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.externalMessageLog.size());//we just store a value, so we wait for the answer of this call
+                System.out.println("Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalMessageLog.length +" messages");
+                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.externalMessageLog.length);//we just store a value, so we wait for the answer of this call
 
             }
     }
@@ -49,15 +62,19 @@ public class MsgReciever implements  Runnable {
     //Recv Message from Sequencer
     public void recvieveInternalMessage( int message ){
         System.out.println("Reciever <" + this.id+"> got [INTERNAL]  message : " + message);
-        this.internalMessageLog.add(message);
+         this.internalMessageLog[internalMessageCount] = message;
+         this.internalMessageCount++;
+
+
 
     }
 
     //Recv Message from Client
     public void recvieveExternalMessage(int message){
         System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
+        this.externalMessageLog[this.extenalMessageCount] = message;
         this.externalRecievedMsgCount++;
-        this.externalMessageLog.add(message);
+        this.extenalMessageCount++;
        // System.out.println("LISTSIZE:" + this.messageLog.size());
 
     }
@@ -74,7 +91,7 @@ public class MsgReciever implements  Runnable {
         while (logLenth > 0) {
             //System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : " + this.externalMessageLog.get(logLenth - messageCount));
             //System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
-            this.sequencer.recieveInternalMessage(this.externalMessageLog.get(logLenth - messageCount));
+            this.sequencer.recieveInternalMessage(this.externalMessageLog[(logLenth - messageCount)]);
             messageCount -- ;
 
         }
@@ -93,7 +110,7 @@ public class MsgReciever implements  Runnable {
     //Store Messages in a File after Reciever Shutdown
     public void storeMessageLogToFile() throws java.io.FileNotFoundException  {
 
-        File file = new File("/home/loan/Documents/uni/semester9/distributed_systems/Distributed_Systems_Java/Homework2/src/HomeWork2/Logs/LOG-ID-"+this.id+".txt");
+        File file = new File("D:\\Coding\\UNI\\Semester 9\\Verteilte SYsteme Homework\\HA2\\Distributed_Systems_Java\\Homework2\\src\\HomeWork2\\Logs/LOG-ID-"+this.id+".txt");
         PrintWriter pw = new PrintWriter(file);
        for (int message : this.internalMessageLog){
            pw.write(Integer.toString( message ) );

@@ -1,8 +1,12 @@
 package HomeWork2;
 
 
+import java.awt.event.WindowAdapter;
+import java.io.InterruptedIOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -11,13 +15,14 @@ public class Main {
 
 //       int amountOfMessages = 100;
 
-       testNThreads(100,5);
+       testNThreads(100,3);
+     //   testNThreadsRandomNums(100, 2);
 
      }
 
 
 
-    public static void testRandom(){
+    public static void testNThreadsRandomNums(){
         Random r = new Random();
 
         for (int i = 0  ; i <= 100; i++){
@@ -28,12 +33,68 @@ public class Main {
 
     }
 
+
+    public static  void testNThreadsRandomNums(int amountOfMessages, int amountOfThreads) throws java.io.FileNotFoundException{
+
+        Random r = new Random();
+
+        Thread[] recieverThreads = new Thread[amountOfThreads];
+        MessageSequencer sequencer = new MessageSequencer(amountOfMessages);
+        MsgReciever[] recievers =  new MsgReciever[amountOfThreads];
+
+
+        for (int i= 0; i< amountOfThreads;i++){//create all reciever Threads and store them in an array
+            recievers[i] = new MsgReciever(sequencer,amountOfMessages,i);
+            recieverThreads[i] = new Thread(recievers[i]);
+
+        }
+
+        sequencer.setRecievers(recieverThreads);
+
+        for(int i = 0; i < amountOfThreads; i++){
+            recieverThreads[i].setPriority(10);
+        }
+
+        for(int i = 0; i < amountOfThreads; i++){
+            recieverThreads[i].start();
+        }
+
+
+        List<Integer> valuesSend = new LinkedList<>();
+        for (int i = 0 ; i < amountOfMessages; i++){//send msg to recvers
+
+            //select Random Number between 0 and AmountOfThreads to select a thread randomly who recieves a message
+            //sendMessageToRandomReciever(recievers);
+            valuesSend.add(r.nextInt(100));
+            recievers[r.nextInt(amountOfThreads)].recvieveExternalMessage(valuesSend.get(i));
+
+
+        }
+        for(int i = 0; i < amountOfThreads; i++){
+            recievers[i].storeMessageLogToFile();
+        }
+
+
+        // TODO BUGGY
+        System.out.println("VALUES SEND :" );
+        String printString = " ";
+        for (int val : valuesSend){
+            System.out.println("Adding: " + val );
+            printString.concat(Integer.toString(val )+ ",  " );
+            System.out.println("String is "+ printString);
+        }
+
+        System.out.println("Done building!");
+        System.clearProperty(printString);
+    }
+
     /**
+     *
      * Test N Threads, where we Randomly select a Thread which will recieve a message
      * @param amountOfMessages
      * @param amountOfThreads
      */
-    public static  void testNThreads(int amountOfMessages, int amountOfThreads){
+    public static  void testNThreads(int amountOfMessages, int amountOfThreads)throws java.io.FileNotFoundException{
 
         Random r = new Random();
 
@@ -65,6 +126,9 @@ public class Main {
             recievers[r.nextInt(amountOfThreads)].recvieveExternalMessage(i);
 
 
+        }
+        for(int i = 0; i < amountOfThreads; i++){
+            recievers[i].storeMessageLogToFile();
         }
 
     }

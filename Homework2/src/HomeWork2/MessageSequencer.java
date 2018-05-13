@@ -7,18 +7,24 @@ public class MessageSequencer implements  Runnable {
     Thread[] recievers;
     int messageAmount;
     int messageCount;
+    int messagesToBroadCast;
+    int messagesAlreadyBoadcasted;
 
     public MessageSequencer( int messageAmount){
          this.messageAmount = messageAmount;
         this.internalmessageLog = new int [messageAmount];
         this.internalmessageLog = new int [messageAmount];
         this.messageCount = 0 ;
+        this.messagesToBroadCast = 0;
+        this.messagesAlreadyBoadcasted = 0;
+
     }
 
 
     public void setRecievers(Thread[]recievers){
         this.recievers =  recievers;
     }
+
     public void recieveInternalMessage(int message){
         System.out.println("{SEQUENCER} GOT NOTIFIED FOR MSG: " + message);
         this.internalmessageLog[this.messageCount] = message;
@@ -34,9 +40,18 @@ public class MessageSequencer implements  Runnable {
 
         //infinite poll loop
         while (true){
+            if(this.messagesToBroadCast>0) {//there are new messages to broadcast !
 
+            }
         }
 
+
+    }
+
+
+    private void broadCastMessages(){
+
+//        for
 
     }
 

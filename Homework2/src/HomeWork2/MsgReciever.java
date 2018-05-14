@@ -90,7 +90,7 @@ public class MsgReciever implements  Runnable {
         this.externalRecievedMsgCount = 0;//Reset the Internal MEsage Count, so we will take care of new messages
         //System.out.println("RECIEVER ID <" + this.id+ "> NOTFIYING");
 
-        while (messageCount >=0) {
+        while (messageCount >0) {
           //  System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : NR " +(logLenth - messageCount)+ "hich is :" + this.externalMessageLog[(logLenth - messageCount)]);
    //         System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
             //System.out.println("RECIEVER < " +this.id + " sending Inddex NR ;" + this.lastMessageSent + " and message Count : " + messageCount);
@@ -99,6 +99,7 @@ public class MsgReciever implements  Runnable {
             messageCount -- ;
 
         }
+        System.out.println("LAST MESSAGE SEND IS :" + this.lastMessageSent);
 
     return true;
 

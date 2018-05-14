@@ -15,7 +15,7 @@ public class Main {
 
 //       int amountOfMessages = 100;
 
-      testNThreads(40,3);
+      testNThreads(10000,4);
      //   testNThreadsRandomNums(100, 2);
        //     testThreadingAndPollingOneThread(100);
      }
@@ -121,7 +121,7 @@ public class Main {
             recieverThreads[i].start();
         }
 
-        for (int i = 0 ; i < amountOfMessages; i++){//send msg to recvers
+        for (int i = 0 ; i < amountOfMessages-1; i++){//send msg to recvers
 
             //select Random Number between 0 and AmountOfThreads to select a thread randomly who recieves a message
            //sendMessageToRandomReciever(recievers);

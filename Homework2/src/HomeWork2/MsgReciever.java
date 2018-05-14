@@ -20,6 +20,7 @@ public class MsgReciever implements  Runnable {
     int externalRecievedMsgCount ; //If ext Msg Count is >0, we must have recieved new External Messages and broadcast them
 
     int internalMessageCount,extenalMessageCount; //represents how many solts in our message array are allocated
+    int lastMessageSent;
 
     public MsgReciever( MessageSequencer sequencer, int internalMessageAmount, int id ){
         this.externalRecievedMsgCount = 0 ;
@@ -27,12 +28,12 @@ public class MsgReciever implements  Runnable {
         this.id = id;
 
         //both can be same size
-        this.internalMessageLog  = new int[internalMessageAmount];
+        this.internalMessageLog  = new int[internalMessageAmount];//quick and dirty fix?
         this.externalMessageLog = new int[internalMessageAmount];
 
         this.internalMessageCount = 0;
         this.externalRecievedMsgCount = 0;
-
+        this.lastMessageSent = 0;
         //this.internalMessageLog = new LinkedList<Integer>();
         //this.externalMessageLog = new LinkedList<Integer>();
 
@@ -47,11 +48,10 @@ public class MsgReciever implements  Runnable {
     while (true)
     {
 
-
         //we must have recvd a new message -> notify Sequencer to broadcast it
         if( this.externalRecievedMsgCount > 0 ) {
-                System.out.println("___________Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalMessageLog.length +" messages____________________________");
-                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.externalRecievedMsgCount);//we just store a value, so we wait for the answer of this call
+                System.out.println("___________Reciever ID <"+this.id+"> ![NOTIFYING]! " + this.externalRecievedMsgCount +" messages____________________________");
+                sending = notifySequencerOfNewMessages(this.externalRecievedMsgCount, this.internalMessageLog.length);///wtf 2nd parameter not sure if needed
                 System.out.println("_______________________Done Notifiying!____________________");
             }
     }
@@ -61,7 +61,7 @@ public class MsgReciever implements  Runnable {
 
     //Recv Message from Sequencer
     public void recvieveInternalMessage( int message ){
-        System.out.println("Reciever <" + this.id+"> got [INTERNAL]  message : " + message);
+         System.out.println("Reciever <" + this.id+"> got [INTERNAL]  message : " + message);
          this.internalMessageLog[internalMessageCount] = message;
          this.internalMessageCount++;
 
@@ -71,10 +71,11 @@ public class MsgReciever implements  Runnable {
 
     //Recv Message from Client
     public void recvieveExternalMessage(int message){
-        System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
+       // System.out.println("Reciever <" + this.id+"> got [EXTERBAL] message : " + message);
         this.externalMessageLog[this.extenalMessageCount] = message;
         this.externalRecievedMsgCount++;
         this.extenalMessageCount++;
+
        // System.out.println("LISTSIZE:" + this.messageLog.size());
 
     }
@@ -87,13 +88,14 @@ public class MsgReciever implements  Runnable {
     private boolean notifySequencerOfNewMessages(int messageCount, int logLenth) {
 
         this.externalRecievedMsgCount = 0;//Reset the Internal MEsage Count, so we will take care of new messages
-        System.out.println("RECIEVER ID <" + this.id+ "> NOTFIYING");
+        //System.out.println("RECIEVER ID <" + this.id+ "> NOTFIYING");
 
-        while (messageCount >0) {
-            System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : NR " +(logLenth - messageCount));
-            System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
-
-            this.sequencer.recieveInternalMessage(this.externalMessageLog[(logLenth - messageCount)]);
+        while (messageCount >=0) {
+          //  System.out.println("Reciever <" + this.id+"> notifying [INTERNAL] message : NR " +(logLenth - messageCount)+ "hich is :" + this.externalMessageLog[(logLenth - messageCount)]);
+   //         System.out.println("Trying to get :" + (logLenth - messageCount) + " Since logLenth : " + logLenth + " and newMsgCount :" + messageCount );
+            //System.out.println("RECIEVER < " +this.id + " sending Inddex NR ;" + this.lastMessageSent + " and message Count : " + messageCount);
+            this.sequencer.recieveInternalMessage(this.externalMessageLog[this.lastMessageSent]);
+            this.lastMessageSent++;
             messageCount -- ;
 
         }

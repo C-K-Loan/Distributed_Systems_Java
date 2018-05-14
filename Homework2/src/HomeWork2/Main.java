@@ -15,9 +15,9 @@ public class Main {
 
 //       int amountOfMessages = 100;
 
-       testNThreads(100,3);
+      testNThreads(40,3);
      //   testNThreadsRandomNums(100, 2);
-
+       //     testThreadingAndPollingOneThread(100);
      }
 
 
@@ -49,7 +49,7 @@ public class Main {
 
         }
 
-        sequencer.setRecievers(recieverThreads);
+        sequencer.setRecievers(recieverThreads,recievers);
 
         for(int i = 0; i < amountOfThreads; i++){
             recieverThreads[i].setPriority(10);
@@ -101,7 +101,7 @@ public class Main {
         Thread[] recieverThreads = new Thread[amountOfThreads];
         MessageSequencer sequencer = new MessageSequencer(amountOfMessages);
         MsgReciever[] recievers =  new MsgReciever[amountOfThreads];
-
+        Thread sequencerThread = new Thread (sequencer);
 
         for (int i= 0; i< amountOfThreads;i++){//create all reciever Threads and store them in an array
             recievers[i] = new MsgReciever(sequencer,amountOfMessages,i);
@@ -109,8 +109,10 @@ public class Main {
 
         }
 
-        sequencer.setRecievers(recieverThreads);
+        sequencer.setRecievers(recieverThreads,recievers);
 
+        sequencerThread.setPriority(10);
+        sequencerThread.start();
         for(int i = 0; i < amountOfThreads; i++){
             recieverThreads[i].setPriority(10);
         }
@@ -139,7 +141,7 @@ public class Main {
     }
 
     public static void testThreadingAndPollingOneThread(int amountOfMessages) throws java.io.FileNotFoundException{
-
+System.out.println("THIS TEST IS BUGGY _______________________ FUX!");
         MessageSequencer sequencer = new MessageSequencer(amountOfMessages);
         MsgReciever reciever = new MsgReciever(sequencer,amountOfMessages,0);
 
@@ -148,7 +150,7 @@ public class Main {
 
         Thread t0 =         new Thread(reciever);
         recievers[0] = t0;
-        sequencer.setRecievers(recievers);
+        sequencer.setRecievers(recievers, null);
         t0.setPriority(10);
         t0.start();
 

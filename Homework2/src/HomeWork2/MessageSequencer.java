@@ -4,7 +4,9 @@ public class MessageSequencer implements  Runnable {
 
     int [] internalmessageLog;
     int [] internalMessageQue;
-    Thread[] recievers;
+    int lastMessageSend;
+    Thread[] recieverThreads;
+    MsgReciever[] recievers;
     int messageAmount;
     int messageCount;
     int messagesToBroadCast;
@@ -17,20 +19,21 @@ public class MessageSequencer implements  Runnable {
         this.messageCount = 0 ;
         this.messagesToBroadCast = 0;
         this.messagesAlreadyBoadcasted = 0;
+        this.lastMessageSend= 0;
 
     }
 
 
-    public void setRecievers(Thread[]recievers){
-        this.recievers =  recievers;
+    public void setRecievers(Thread[]recieverThreads , MsgReciever[] recievers  ){
+        this.recieverThreads =  recieverThreads;
+        this.recievers = recievers;
     }
 
     public void recieveInternalMessage(int message){
-        System.out.println("{SEQUENCER} GOT NOTIFIED FOR MSG: " + message);
         this.internalmessageLog[this.messageCount] = message;
         this.messageCount ++ ;
-
-
+        this.messagesToBroadCast++;
+        System.out.println("{SEQUENCER} GOT NOTIFIED FOR MSG: " + message + " AND I HAVE AMOUNT MSG:" + this.messageCount);
     }
 
 
@@ -40,7 +43,8 @@ public class MessageSequencer implements  Runnable {
 
         //infinite poll loop
         while (true){
-            if(this.messagesToBroadCast>0) {//there are new messages to broadcast !
+             if(this.messagesToBroadCast>0) {//there are new messages to broadcast !
+                 //broadCastMessages(this.messagesToBroadCast);
 
             }
         }
@@ -48,11 +52,31 @@ public class MessageSequencer implements  Runnable {
 
     }
 
-
-    private void broadCastMessages(){
-
-//        for
+    /**
+     * We keep track of which is the last index that we have send. We then increase the LastMessageSend Counter by MessagesTobroadcast
+      * @param messagesToBroadCast How many msg to broadcast
+      */
+    private void broadCastMessages(int messagesToBroadCast ){
+        this.messagesToBroadCast = 0;
+        System.out.println("{SEQUENCER} Broadcasting : " + messagesToBroadCast + " Messages!");
+        while(messagesToBroadCast >0 && lastMessageSend< internalmessageLog.length){
+            broadCastValue(this.internalmessageLog[lastMessageSend]);
+            this.lastMessageSend++;
+            messagesToBroadCast--;
+        }
+        System.out.println("done broadcasting");
 
     }
 
+    /**
+     * Broadcast one Value to every thrad
+     * @param val the value to broadcast
+     */
+    private void broadCastValue(int val){
+
+        for (MsgReciever reciever : this.recievers){
+            reciever.recvieveInternalMessage(val);
+        }
+
+    }
 }
